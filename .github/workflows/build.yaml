@@ -4,7 +4,7 @@ env:
   #### An dieser Stelle müssen eure persönlichen Umgebungsvariablen eingetragen werden
   # Tipp: Die Token/der API-Key werden als Secrets in den Repository-Settings eingetragen und hier referenziert.
   # Test
-  GITHUB_ACCESSTOKEN: ${{ secrets.GITHUB_ACCESSTOKEN }}
+  GITHUB_ACCESSTOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 jobs:
   compile:
     name: Compile
@@ -18,6 +18,10 @@ jobs:
           java-version: 11
 
       - name: Compile, build and push
+        env:
+          IMAGE: ghcr.io/moritzf3/pet-clinic:latest
         run: |
-          #### AUFGABE COMPILE, DOCKER BUILD UND PUSH
-            # hier ist Platz für maven package und docker build
+          mvn clean package
+          echo "${GITHUB_ACCESSTOKEN}" | docker login ghcr.io -u moritzf3 --password-stdin
+          docker build -t "${IMAGE}" .
+          docker push "${IMAGE}"
